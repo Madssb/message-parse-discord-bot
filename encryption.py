@@ -14,15 +14,14 @@ Note:
 The AES key must be exactly 32 bytes (256 bits), provided as a
 hex string via the ENCRYPTION_KEY environment variable.
 """
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.backends import default_backend
-import os
 import base64
 import hashlib
-
-from dotenv import load_dotenv
 import os
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from dotenv import load_dotenv
 
 load_dotenv()
 key_hex = os.getenv("ENCRYPTION_KEY")
