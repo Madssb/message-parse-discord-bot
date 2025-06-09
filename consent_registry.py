@@ -30,9 +30,11 @@ cur = con.cursor()
 # instantiate consent_registry
 res = cur.execute("SELECT name FROM sqlite_master WHERE name='consent_registry'")
 if res.fetchone() is None:
-    cur.execute("""
+    cur.execute(
+        """
         CREATE TABLE consent_registry (user_id_hash TEXT PRIMARY KEY)
-    """)
+    """
+    )
     con.commit()
     logger.debug("consent_registry successfully instantiated")
 else:
@@ -42,22 +44,27 @@ else:
 # instantiate consent_log
 res = cur.execute("SELECT name FROM sqlite_master WHERE name='consent_log'")
 if res.fetchone() is None:
-    cur.execute("""
+    cur.execute(
+        """
         CREATE TABLE consent_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id_enc TEXT NOT NULL,
             action TEXT NOT NULL,
             timestamp TEXT NOT NULL
         )
-    """)
+    """
+    )
     con.commit()
     logger.debug("consent_log successfully instantiated")
 else:
     logger.debug("consent_log not instantiated: already exists.")
 
 
-def log_consent(user_id_hash: str, enc_user_id: str,
-                action: Literal["gave consent", "retracted consent"]) -> None:
+def log_consent(
+    user_id_hash: str,
+    enc_user_id: str,
+    action: Literal["gave consent", "retracted consent"],
+) -> None:
     """Log a consent action to the consent_log table.
 
     Args:
@@ -69,17 +76,23 @@ def log_consent(user_id_hash: str, enc_user_id: str,
         ValueError: If the action is not a valid consent operation.
     """
     if action not in {"gave consent", "retracted consent"}:
-        logger.critical(f"Invalid action. Expected 'gave consent' or 'retracted consent', got: {action}.")
+        logger.critical(
+            f"Invalid action. Expected 'gave consent' or 'retracted consent', got: {action}."
+        )
     try:
         timestamp = datetime.now().isoformat()
         cur.execute(
             "INSERT INTO consent_log (user_id_enc, action, timestamp) VALUES (?, ?, ?)",
-            (enc_user_id, action, timestamp)
+            (enc_user_id, action, timestamp),
         )
         con.commit()
-        logger.debug(f"Added consent_registry entry for user hash {user_id_hash[:6]}...")
+        logger.debug(
+            f"Added consent_registry entry for user hash {user_id_hash[:6]}..."
+        )
     except Exception as e:
-        logger.critical(f"Failed to add consent_registry entry for user hash {user_id_hash[:6]}...: {e}")
+        logger.critical(
+            f"Failed to add consent_registry entry for user hash {user_id_hash[:6]}...: {e}"
+        )
         raise e
 
 
@@ -93,12 +106,18 @@ def register_consent(user_id_hash: str, enc_user_id: str) -> None:
         enc_user_id (str): Encrypted user ID for logging.
     """
     try:
-        cur.execute("INSERT INTO consent_registry(user_id_hash) VALUES (?)", (user_id_hash,))
+        cur.execute(
+            "INSERT INTO consent_registry(user_id_hash) VALUES (?)", (user_id_hash,)
+        )
         con.commit()
-        logger.debug(f"Added consent_registry entry for user hash {user_id_hash[:6]}...")
+        logger.debug(
+            f"Added consent_registry entry for user hash {user_id_hash[:6]}..."
+        )
         log_consent(user_id_hash, enc_user_id, "gave consent")
     except Exception as e:
-        logger.error(f"Failed to add consent_registry entry for user hash {user_id_hash[:6]}...: {e}")
+        logger.error(
+            f"Failed to add consent_registry entry for user hash {user_id_hash[:6]}...: {e}"
+        )
 
 
 def retract_consent(user_id_hash: str, enc_user_id: str) -> None:
@@ -109,12 +128,18 @@ def retract_consent(user_id_hash: str, enc_user_id: str) -> None:
         enc_user_id (str): Encrypted user ID for logging purposes.
     """
     try:
-        cur.execute("DELETE FROM consent_registry WHERE user_id_hash = ?", (user_id_hash,))
+        cur.execute(
+            "DELETE FROM consent_registry WHERE user_id_hash = ?", (user_id_hash,)
+        )
         con.commit()
-        logger.debug(f"Deleted consent_registry entry for user hash {user_id_hash[:6]}...")
+        logger.debug(
+            f"Deleted consent_registry entry for user hash {user_id_hash[:6]}..."
+        )
         log_consent(user_id_hash, enc_user_id, "retracted consent")
     except Exception as e:
-        logger.critical(f"Failed to delete consent_registry entry for user hash {user_id_hash[:6]}...: {e}")
+        logger.critical(
+            f"Failed to delete consent_registry entry for user hash {user_id_hash[:6]}...: {e}"
+        )
         raise e
 
 
@@ -128,9 +153,13 @@ def consent_is_registered(user_id_hash: str) -> bool:
         bool: True if the user has given consent, False otherwise.
     """
     try:
-        res = cur.execute("SELECT 1 FROM consent_registry WHERE user_id_hash = ?", (user_id_hash,))
+        res = cur.execute(
+            "SELECT 1 FROM consent_registry WHERE user_id_hash = ?", (user_id_hash,)
+        )
         found = res.fetchone() is not None
-        logger.debug(f"Checked consent for hash {user_id_hash[:6]}...: {'found' if found else 'not found'}")
+        logger.debug(
+            f"Checked consent for hash {user_id_hash[:6]}...: {'found' if found else 'not found'}"
+        )
         return found
     except Exception as e:
         logger.critical(f"Failed to check consent for hash {user_id_hash[:6]}...: {e}")

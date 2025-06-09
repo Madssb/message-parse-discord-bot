@@ -52,6 +52,7 @@ def encrypt(data: str) -> str:
 
     return base64.b64encode(iv + ct).decode()
 
+
 def decrypt(token: str) -> str:
     """Decrypt a Base64-encoded AES-256 encrypted string.
 

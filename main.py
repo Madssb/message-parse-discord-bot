@@ -34,6 +34,7 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
 
+
 @client.event
 async def on_ready():
     """Triggered when the bot is fully connected and ready."""
@@ -43,10 +44,12 @@ async def on_ready():
     print(f"Logged in as {client.user} (ID: {client.user.id})")
     print("Slash commands synced to guild.")
 
+
 class ConsentButton(discord.ui.View):
     """
     View presenting a consent button that registers the user's consent.
     """
+
     def __init__(self, *, timeout=180):
         """
         Initialize the consent button view.
@@ -55,9 +58,11 @@ class ConsentButton(discord.ui.View):
             timeout (int): Timeout in seconds before the view is disabled.
         """
         super().__init__(timeout=timeout)
-    
+
     @discord.ui.button(label="I consent", style=discord.ButtonStyle.green)
-    async def consent_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def consent_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
         """
         Handle consent button press: encrypts and hashes user ID, registers consent.
 
@@ -68,12 +73,16 @@ class ConsentButton(discord.ui.View):
         user_id_hash = hash_user_id(str(interaction.user.id))
         enc_user_id = encrypt(str(interaction.user.id))
         register_consent(user_id_hash, enc_user_id)
-        await interaction.response.edit_message(content="Your consent has been registered. Thanks!", view=None)
+        await interaction.response.edit_message(
+            content="Your consent has been registered. Thanks!", view=None
+        )
+
 
 class RetractConsentButton(discord.ui.View):
     """
     View presenting a button to retract previously given consent.
     """
+
     def __init__(self, *, timeout=180):
         """
         Initialize the retraction button view.
@@ -81,10 +90,12 @@ class RetractConsentButton(discord.ui.View):
         Args:
             timeout (int): Timeout in seconds before the view is disabled.
         """
-        super().__init__(timeout=timeout)  
-    
+        super().__init__(timeout=timeout)
+
     @discord.ui.button(label="I retract consent", style=discord.ButtonStyle.red)
-    async def retract_consent_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def retract_consent_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
         """
         Handle retraction button press: encrypts and hashes user ID, removes consent.
 
@@ -97,16 +108,20 @@ class RetractConsentButton(discord.ui.View):
             user_id_hash = hash_user_id(user_id)
             enc_user_id = encrypt(user_id)
             retract_consent(user_id_hash, enc_user_id)
-            await interaction.response.edit_message(content="Your consent has been retracted", view=None)
+            await interaction.response.edit_message(
+                content="Your consent has been retracted", view=None
+            )
         except Exception as e:
             logger.critical(f"Consent retraction failed at UI level: {e}")
             await interaction.response.send_message(
                 content="An error occurred while processing your retraction. Please try again later.",
-                ephemeral=True
+                ephemeral=True,
             )
 
 
-@tree.command(name="placeholder", description="placeholder", guild=discord.Object(id=GUILD_ID))
+@tree.command(
+    name="placeholder", description="placeholder", guild=discord.Object(id=GUILD_ID)
+)
 async def hello_command(interaction: discord.Interaction):
     """
     Slash command for showing consent status and the appropriate action button.
@@ -116,9 +131,13 @@ async def hello_command(interaction: discord.Interaction):
     """
     user_id_hash = hash_user_id(str(interaction.user.id))
     if not consent_is_registered(user_id_hash):
-        await interaction.response.send_message("Your consent is not registered.", ephemeral=True, view=ConsentButton())
+        await interaction.response.send_message(
+            "Your consent is not registered.", ephemeral=True, view=ConsentButton()
+        )
     else:
-        await interaction.response.send_message("Your consent is registered.", ephemeral=True, view=RetractConsentButton())
-        
+        await interaction.response.send_message(
+            "Your consent is registered.", ephemeral=True, view=RetractConsentButton()
+        )
+
 
 client.run(TOKEN)
