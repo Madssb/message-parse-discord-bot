@@ -4,3 +4,4 @@
 *.log                  # Any logs you might write
 *.sqlite3              # In case you switch to a different db name
 consent.log
+project_data.db

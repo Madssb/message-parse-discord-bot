@@ -106,18 +106,21 @@ class RetractConsentButton(discord.ui.View):
 
 def setup_consent_commands(tree: discord.app_commands.CommandTree, guild_id: int):
     @tree.command(
-        name="placeholder", description="placeholder", guild=discord.Object(id=guild_id)
+        name="consent",
+        description="Manage your consent for data collection in #below-emerald.",
+        guild=discord.Object(id=guild_id),
     )
     async def consent_command(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         user_id_hash = hash_user_id(str(interaction.user.id))
         if not consent_is_registered(user_id_hash):
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 NOT_CONSENTED_MESSAGE + "\n\n" + CONSENT_MESSAGE,
                 ephemeral=True,
                 view=ConsentButton(),
             )
         else:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 ALREADY_CONSENTED_MESSAGE,
                 ephemeral=True,
                 view=RetractConsentButton(),

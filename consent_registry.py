@@ -13,51 +13,32 @@ Tables:
 - consent_registry(user_id_hash TEXT PRIMARY KEY)
 - consent_log(id INTEGER, user_id_enc TEXT, action TEXT, timestamp TEXT)
 """
+import logging
 import sqlite3
 from datetime import datetime
 from typing import Literal
-import logging
-from log_config import setup_logging
 
+from log_config import setup_logging
 
 logger = logging.getLogger(__name__)
 setup_logging()
 
 
-con = sqlite3.connect("consent_registry.db")
+con = sqlite3.connect("project_data.db")
 cur = con.cursor()
 
+
 # instantiate consent_registry
-res = cur.execute("SELECT name FROM sqlite_master WHERE name='consent_registry'")
-if res.fetchone() is None:
-    cur.execute(
-        """
-        CREATE TABLE consent_registry (user_id_hash TEXT PRIMARY KEY)
-    """
+def assert_table_exists(table_name: str):
+    res = cur.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,)
     )
-    con.commit()
-    logger.debug("consent_registry successfully instantiated")
-else:
-    logger.debug("consent_registry not instantiated: already exists.")
+    if res.fetchone() is None:
+        raise RuntimeError(f"Required table '{table_name}' is missing in the database.")
 
 
-# instantiate consent_log
-res = cur.execute("SELECT name FROM sqlite_master WHERE name='consent_log'")
-if res.fetchone() is None:
-    cur.execute(
-        """
-        CREATE TABLE consent_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id_enc TEXT NOT NULL,
-            action TEXT NOT NULL,
-            timestamp TEXT NOT NULL
-        )
-    """
-    )
-    con.commit()
-    logger.debug("consent_log successfully instantiated")
-else:
-    logger.debug("consent_log not instantiated: already exists.")
+assert_table_exists("consent_registry")
+assert_table_exists("consent_log")
 
 
 def log_consent(
@@ -121,24 +102,24 @@ def register_consent(user_id_hash: str, enc_user_id: str) -> None:
 
 
 def retract_consent(user_id_hash: str, enc_user_id: str) -> None:
-    """Remove a user's consent record from the registry and log the action.
-
-    Args:
-        user_id_hash (str): Hashed user ID to delete from the registry.
-        enc_user_id (str): Encrypted user ID for logging purposes.
-    """
+    """Remove a user's consent and associated data from the registry and logs."""
     try:
+        # Delete from consent_registry
         cur.execute(
             "DELETE FROM consent_registry WHERE user_id_hash = ?", (user_id_hash,)
         )
+        # Delete associated message records
+        cur.execute("DELETE FROM data WHERE user_id_hash = ?", (user_id_hash,))
+
         con.commit()
+
         logger.debug(
-            f"Deleted consent_registry entry for user hash {user_id_hash[:6]}..."
+            f"Deleted consent_registry and data entries for hash {user_id_hash[:6]}..."
         )
         log_consent(user_id_hash, enc_user_id, "retracted consent")
     except Exception as e:
         logger.critical(
-            f"Failed to delete consent_registry entry for user hash {user_id_hash[:6]}...: {e}"
+            f"Consent retraction failed for hash {user_id_hash[:6]}...: {e}"
         )
         raise e
 
