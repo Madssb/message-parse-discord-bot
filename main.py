@@ -38,4 +38,5 @@ async def on_ready():
     print("Slash commands synced.")
 
 
-client.run(TOKEN)
+if __name__ == "__main__":
+    client.run(TOKEN)
