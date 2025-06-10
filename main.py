@@ -6,6 +6,7 @@ import discord
 from dotenv import load_dotenv
 
 from consent import setup_consent_commands
+from initialize_db import initialize_db
 from log_config import setup_logging
 from message_parser import setup_message_parse_command
 
@@ -39,4 +40,5 @@ async def on_ready():
 
 
 if __name__ == "__main__":
+    initialize_db()
     client.run(TOKEN)
