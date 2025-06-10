@@ -1,7 +1,7 @@
 /.env
 /__pycache__
 /consent_registry.db
-*.log                  # Any logs you might write
-*.sqlite3              # In case you switch to a different db name
+*.log
+*.sqlite3
 consent.log
 project_data.db
