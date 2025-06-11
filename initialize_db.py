@@ -7,7 +7,7 @@ def get_connection():
     Returns:
         sqlite3.Connection: A database connection with autocommit enabled.
     """
-    return sqlite3.connect("data/project_data.db", timeout=10, isolation_level=None)
+    return sqlite3.connect("/data/project_data.db", timeout=10, isolation_level=None)
 
 
 def initialize_db():

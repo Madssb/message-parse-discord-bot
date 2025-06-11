@@ -1,9 +1,9 @@
 # log_config.py
-
 import logging
 
 
-def setup_logging(logfile: str = "data/consent.log", level: int = logging.DEBUG):
+def setup_logging(logfile: str = "/data/consent.log", level: int = logging.DEBUG):
+
     logging.basicConfig(
         level=level,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
