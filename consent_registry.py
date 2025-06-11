@@ -25,31 +25,6 @@ setup_logging()
 from initialize_db import get_connection
 
 
-def assert_table_exists(table_name: str):
-    """Ensure the specified table exists in the database.
-
-    Args:
-        table_name (str): The name of the table to check.
-
-    Raises:
-        RuntimeError: If the table is missing.
-    """
-    with get_connection() as con:
-        cur = con.cursor()
-        res = cur.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-            (table_name,),
-        )
-        if res.fetchone() is None:
-            raise RuntimeError(
-                f"Required table '{table_name}' is missing in the database."
-            )
-
-
-assert_table_exists("consent_registry")
-assert_table_exists("consent_log")
-
-
 def log_consent(
     user_id_hash: str,
     enc_user_id: str,

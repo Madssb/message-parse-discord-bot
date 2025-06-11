@@ -12,9 +12,7 @@ from message_parser import setup_message_parse_command
 
 logger = logging.getLogger(__name__)
 setup_logging()
-
-
-setup_logging()
+initialize_db()
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -33,12 +31,10 @@ async def on_ready():
     channel = client.get_channel(CHANNEL_ID)
     setup_consent_commands(tree, GUILD_ID)
     setup_message_parse_command(tree, channel, GUILD_ID)
-    logger.debug(f"channel: {channel}")
     await tree.sync(guild=discord.Object(id=GUILD_ID))
-    print(f"Logged in as {client.user} (ID: {client.user.id})")
-    print("Slash commands synced.")
+    logger.info(f"Logged in as {client.user} (ID: {client.user.id})")
+    logger.info("Slash commands synced.")
 
 
 if __name__ == "__main__":
-    initialize_db()
     client.run(TOKEN)

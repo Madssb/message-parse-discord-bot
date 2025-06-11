@@ -45,7 +45,3 @@ def initialize_db():
         )
 
         print("Database initialized (no-op if already exists).")
-
-
-if __name__ == "__main__":
-    initialize_db()
