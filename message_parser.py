@@ -20,30 +20,6 @@ class MissingIntentsError(Exception):
     pass
 
 
-def assert_table_exists(table_name: str):
-    """Ensure the specified table exists in the database.
-
-    Args:
-        table_name (str): The name of the table to check.
-
-    Raises:
-        RuntimeError: If the table is missing.
-    """
-    with get_connection() as con:
-        cur = con.cursor()
-        res = cur.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-            (table_name,),
-        )
-        if res.fetchone() is None:
-            raise RuntimeError(
-                f"Required table '{table_name}' is missing in the database."
-            )
-
-
-assert_table_exists("data")
-
-
 def compute_row_hash(user_id_hash: str, message_enc: str) -> str:
     """Create a SHA-256 hash from a user hash and encrypted message.
 
