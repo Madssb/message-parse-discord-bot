@@ -22,15 +22,7 @@ from log_config import setup_logging
 
 logger = logging.getLogger(__name__)
 setup_logging()
-
-
-def get_connection():
-    """Establish a new SQLite connection with autocommit behavior.
-
-    Returns:
-        sqlite3.Connection: A database connection with autocommit enabled.
-    """
-    return sqlite3.connect("data/project_data.db", timeout=10, isolation_level=None)
+from initialize_db import get_connection
 
 
 def assert_table_exists(table_name: str):
