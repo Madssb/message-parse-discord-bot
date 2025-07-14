@@ -5,19 +5,17 @@ import os
 import discord
 from dotenv import load_dotenv
 
+from config import CHANNEL_ID, GUILD_ID, TOKEN
 from consent import setup_consent_commands
 from initialize_db import initialize_db
 from log_config import setup_logging
 from message_parser import setup_message_parse_command
 
 logger = logging.getLogger(__name__)
+
 setup_logging()
 initialize_db()
-load_dotenv()
 
-TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_ID = int(os.getenv("SERVER_ID"))
-CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
 intents = discord.Intents.default()
 intents.message_content = True
