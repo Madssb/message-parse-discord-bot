@@ -21,11 +21,8 @@ import os
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from dotenv import load_dotenv
 
 from config import ENCRYPTION_KEY
-
-load_dotenv()
 
 if ENCRYPTION_KEY is None:
     raise EnvironmentError("ENCRYPTION_KEY not set in environment.")

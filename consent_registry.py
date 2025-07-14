@@ -18,11 +18,11 @@ import sqlite3
 from datetime import datetime
 from typing import Literal
 
-from log_config import setup_logging
+from config import setup_logging
+from initialize_db import get_connection
 
 logger = logging.getLogger(__name__)
 setup_logging()
-from initialize_db import get_connection
 
 
 def log_consent(

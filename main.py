@@ -5,10 +5,9 @@ import os
 import discord
 from dotenv import load_dotenv
 
-from config import CHANNEL_ID, GUILD_ID, TOKEN
+from config import CHANNEL_ID, GUILD_ID, TOKEN, setup_logging
 from consent import setup_consent_commands
 from initialize_db import initialize_db
-from log_config import setup_logging
 from message_parser import setup_message_parse_command
 
 logger = logging.getLogger(__name__)

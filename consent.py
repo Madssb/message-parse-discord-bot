@@ -3,11 +3,12 @@ import logging
 
 import discord
 
+from config import setup_logging
 from consent_registry import consent_is_registered, register_consent, retract_consent
 from encryption import encrypt, hash_user_id
-from log_config import setup_logging
 
 logger = logging.getLogger(__name__)
+
 setup_logging()
 
 CONSENT_MESSAGE = (

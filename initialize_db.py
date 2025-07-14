@@ -1,7 +1,7 @@
 import os
 import sqlite3
 
-DATABASE_PATH = os.getenv("DATABASE_PATH")
+from config import DATABASE_PATH
 
 
 def get_connection():
