@@ -23,11 +23,13 @@ from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from dotenv import load_dotenv
 
+from config import ENCRYPTION_KEY
+
 load_dotenv()
-key_hex = os.getenv("ENCRYPTION_KEY")
-if key_hex is None:
+
+if ENCRYPTION_KEY is None:
     raise EnvironmentError("ENCRYPTION_KEY not set in environment.")
-KEY = bytes.fromhex(key_hex)
+KEY = bytes.fromhex(ENCRYPTION_KEY)
 if len(KEY) != 32:
     raise ValueError("ENCRYPTION_KEY must be 64 hex characters (256-bit key).")
 
