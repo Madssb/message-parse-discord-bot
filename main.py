@@ -1,9 +1,7 @@
 # main.py
 import logging
-import os
 
 import discord
-from dotenv import load_dotenv
 
 from config import CHANNEL_ID, GUILD_ID, TOKEN, setup_logging
 from consent import setup_consent_commands
