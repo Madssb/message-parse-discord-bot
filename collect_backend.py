@@ -72,7 +72,7 @@ def highest_rank_extractor(user_id_hash: str, guild: discord.Guild):
         "Iron",
         "Unranked",
     ]
-    role_ids = js_r("/home/madssb/mla-project/role_ids_local.json")
+    role_ids = js_r("role_ids_local.json")
     for rank in ranks_ordinal:
         role = guild.get_role(int(role_ids[rank]))
         if role:
