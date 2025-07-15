@@ -1,28 +1,28 @@
-# Discord Consent Bot
+# Below Emerald Enthusiast
 
-This bot collects anonymized consent and message data from a designated channel for analysis purposes (e.g., coaching insights). It follows GDPR principles and provides opt-in/opt-out via Discord slash commands and UI buttons.
+A privacy-focused Discord bot for opt-in message analysis, designed to collect anonymized questions and rank data from a single channel. Built for extracting coaching insights based on user rank and message topics, following GDPR principles.
+
+---
 
 ## Features
 
-- ✅ Slash command `/consent` for users to give or withdraw consent.
-- ✅ Consent logs and encrypted user IDs stored in `project_data.db`.
-- ✅ Slash command `/collect` for parsing historical messages from a specific channel.
-- ✅ Fully anonymized: only hashed IDs and AES-encrypted content are stored.
-- ✅ SQLite backend; no external services required.
-- ✅ Minimal required Discord permissions (Scope: bot).
-- ✅ Bot access can be fully restricted to a single channel via role permissions:
-  - Create a custom role with no permissions.
-  - Assign it to the bot.
-  - Grant that role read access only in the desired channel.
+- ✅ Slash command `/consent` for users to opt-in or retract consent.
+- ✅ Collects highest self-assigned rank at time of consent.
+- ✅ Encrypts message content (AES-256) and anonymizes users (SHA-256 hashing).
+- ✅ Manual `/collect` command parses historical messages from a specific channel.
+- ✅ Consent log and audit trail maintained.
+- ✅ SQLite backend (PostgreSQL planned).
+- ✅ Minimal required Discord permissions (bot + slash commands).
+- ✅ Can be restricted to read a single channel via role permissions.
 
 ---
 
 ## Requirements
 
-- Python 3.10+
-- Discord bot token
-- `message_content` intent **enabled** in the [Discord Developer Portal](https://discord.com/developers/applications)
-- The following Python dependencies (install with pip):
+- Python 3.11+
+- Discord bot token with `message_content` intent enabled.
+- `.env` configuration file.
+- Dependencies installed via:
 
 ```bash
 pip install -r requirements.txt
@@ -30,88 +30,93 @@ pip install -r requirements.txt
 
 ---
 
-## Setup
+## Setup Instructions
 
-### 1. Create `.env` from Template
+### 1. Clone Repo and Configure Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in the following variables:
+Fill in:
 
-- `DISCORD_TOKEN=<your bot token>`
-- `SERVER_ID=<your server (guild) ID>`
-- `CHANNEL_ID=<channel ID for parsing>`
-- `ENCRYPTION_KEY=<32-byte AES key in hex>`
-
-To generate a valid encryption key:
-
-```bash
-python -c "import os; print(os.urandom(32).hex())"
-```
+- `DISCORD_TOKEN`
+- `SERVER_ID`
+- `CHANNEL_ID`
+- `ENCRYPTION_KEY`
+  *(Generate using: `python -c "import os; print(os.urandom(32).hex())"`)*
+- Optional: adjust database or log paths.
 
 ---
 
-### 2. Create Bot Application
+### 2. Create Discord Bot Application
 
-1. Visit [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create new application
-3. Under **Bot → Privileged Gateway Intents**, enable:
-   - ✅ Message Content Intent
-
-4. Under **OAuth2 → URL Generator**:
-   - Scopes: `bot`
-
-Use the generated URL to invite the bot to your server.
+- Go to [Discord Developer Portal](https://discord.com/developers/applications).
+- Create application and bot.
+- Enable:
+  - ✅ MESSAGE CONTENT INTENT,
+  - ✅ SERVER MEMBERS INTENT
+- Install via "Install Link" -> Discord Provided Link.
 
 ---
-
-### 3. Initialize the Database
-
-Before running the bot, create required tables:
-
-```bash
-python initialize_db.py
-```
-
-This creates:
-
-- `consent_registry`
-- `consent_log`
-- `data` (for collected message records)
-
----
-
-## Usage
-
-Start the bot with:
+### 3. Run the Bot
 
 ```bash
 python main.py
 ```
 
-### Slash Commands
+---
 
-- `/consent` — Opens a consent interface with buttons to opt-in or out.
-- `/collect` — Triggers message parsing in the configured channel. Only collects from users who have consented.
+## Usage
+
+- `/consent` — Opens interactive UI to opt-in or withdraw.
+- `/collect` — Parses message history from configured channel, but only for opted-in users.
 
 ---
 
-## Notes
+## Database Schema Overview
 
-- Only one channel is read (as configured in `.env`).
-- Data is stored in `project_data.db`, which should **not** be committed. It’s gitignored.
-- This bot does not request Administrator or excessive permissions.
-- All logic is local and transparent. Tokens and keys are stored only in your local environment.
-- To restrict the bot’s access to a single channel:
-  - Create a role with no base permissions.
-  - Assign this role to the bot.
-  - In the target channel’s settings, allow this role to “Read Messages”.
-  - Ensure no other roles or permissions grant the bot access elsewhere.
+### `tracked_users`
+| Column        | Type   | Description                     |
+|---------------|--------|---------------------------------|
+| user_id_hash  | TEXT   | SHA-256 hash of user ID (PK)    |
+| rank          | TEXT   | User’s highest self-assigned rank |
+
+### `data`
+| Column        | Type   | Description                         |
+|---------------|--------|-------------------------------------|
+| id            | INTEGER| Primary key                         |
+| user_id_hash  | TEXT   | SHA-256 hashed user ID              |
+| message_enc   | TEXT   | AES-256 encrypted message (Base64)  |
+| row_hash      | TEXT   | Deduplication hash                  |
+
+### `consent_log`
+| Column        | Type   | Description                            |
+|---------------|--------|----------------------------------------|
+| id            | INTEGER| Primary key                            |
+| user_id_enc   | TEXT   | AES-256 encrypted user ID              |
+| action        | TEXT   | 'gave consent' or 'retracted consent'  |
+| timestamp     | TEXT   | ISO-formatted timestamp                |
+
+---
+
+## Privacy & GDPR Compliance
+
+- Messages are stored encrypted.
+- Users remain anonymous (hashed IDs).
+- Consent required before any data collection.
+- Full deletion on consent withdrawal.
+- No direct identifiers are stored.
 
 ---
 
 ## License
 
-MIT
+MIT License
+
+---
+
+## Author
+
+Mads S. Balto  
+[https://www.madsbalto.com](https://www.madsbalto.com)

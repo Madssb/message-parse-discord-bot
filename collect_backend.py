@@ -59,20 +59,21 @@ def highest_rank_extractor(user_id_hash: str, guild: discord.Guild):
 
     Returns:
         str or None: The highest rank if exists and None if not."""
-    ranks = [
-        # "challenger",
-        # "grandmaster",
-        # "master",
+    ranks_ordinal = [
+        "challenger",
+        "Grand Master",
+        "Master",
         "Diamond",
         "Emerald",
-        # "platinum",
-        # "gold",
-        # "silver",
-        # "bronze",
-        # "iron",
+        "Platinum",
+        "Gold",
+        "Silver",
+        "Bronze",
+        "Iron",
+        "Unranked",
     ]
     role_ids = js_r("/home/madssb/mla-project/role_ids.json")
-    for rank in ranks:
+    for rank in ranks_ordinal:
         role = guild.get_role(int(role_ids[rank]))
         if role:
             for member in role.members:
