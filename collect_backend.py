@@ -74,7 +74,11 @@ def highest_rank_extractor(user_id_hash: str, guild: discord.Guild):
     ]
     role_ids = js_r("role_ids_local.json")
     for rank in ranks_ordinal:
-        role = guild.get_role(int(role_ids[rank]))
+        try:
+            role = guild.get_role(int(role_ids[rank]))
+        except KeyError:
+            logger.debug(f"key not found: {rank}")
+            role = None
         if role:
             for member in role.members:
                 if user_id_hash == hash_user_id(str(member.id)):

@@ -53,9 +53,12 @@ Fill in:
 
 - Go to [Discord Developer Portal](https://discord.com/developers/applications).
 - Create application and bot.
+- go to Installation page
 - Enable:
   - ✅ MESSAGE CONTENT INTENT,
   - ✅ SERVER MEMBERS INTENT
+- in Guild Install, in scopes, add "bot"
+- In installation contexts, make sure Guild Install is ticked.
 - Install via "Install Link" -> Discord Provided Link.
 
 ---
