@@ -3,8 +3,8 @@ import logging
 
 import discord
 
-from config import setup_logging
-from consent_registry import consent_is_registered, register_consent, retract_consent
+from config import GUILD_ID, setup_logging
+from consent_backend import consent_is_registered, register_consent, retract_consent
 from encryption import encrypt, hash_user_id
 
 logger = logging.getLogger(__name__)
@@ -105,11 +105,11 @@ class RetractConsentButton(discord.ui.View):
             )
 
 
-def setup_consent_commands(tree: discord.app_commands.CommandTree, guild_id: int):
+def setup_consent_commands(tree: discord.app_commands.CommandTree):
     @tree.command(
         name="consent",
         description="Manage your consent for data collection in #below-emerald.",
-        guild=discord.Object(id=guild_id),
+        guild=discord.Object(id=GUILD_ID),
     )
     async def consent_command(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)

@@ -83,3 +83,17 @@ def hash_user_id(user_id: str) -> str:
         str: Hex-encoded SHA-256 hash of the user ID.
     """
     return hashlib.sha256(user_id.encode()).hexdigest()
+
+
+def compute_row_hash(user_id_hash: str, message_enc: str) -> str:
+    """Create a SHA-256 hash from a user hash and encrypted message.
+
+    Args:
+        user_id_hash (str): Hashed user ID.
+        message_enc (str): Encrypted message content.
+
+    Returns:
+        str: A SHA-256 hex digest representing the row hash.
+    """
+    combined = user_id_hash + message_enc
+    return hashlib.sha256(combined.encode()).hexdigest()

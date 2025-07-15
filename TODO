@@ -1,3 +1,1 @@
-- Update .env.example
-- require password for invoking /collect.
-- define a command that retrieves the obtained data.
+- update docs to reflect SERVER MEMBERS INTENT is now enabled

@@ -1,18 +1,4 @@
-# consent_registry.py
-"""Consent registration and logging system for Discord users.
-
-This module manages a consent registry and a corresponding consent log,
-both backed by an SQLite database. It ensures:
-- User IDs are hashed for lookup (privacy-preserving),
-- Encrypted user IDs are stored in the log for auditability,
-- Logging is controlled via Python's logging module.
-
-Encryption and hashing are handled externally via `encryption.py`.
-
-Tables:
-- consent_registry(user_id_hash TEXT PRIMARY KEY)
-- consent_log(id INTEGER, user_id_enc TEXT, action TEXT, timestamp TEXT)
-"""
+# consent_backend.py
 import logging
 import sqlite3
 from datetime import datetime
@@ -22,6 +8,7 @@ from config import setup_logging
 from initialize_db import get_connection
 
 logger = logging.getLogger(__name__)
+
 setup_logging()
 
 
@@ -76,7 +63,7 @@ def register_consent(user_id_hash: str, enc_user_id: str) -> None:
         with get_connection() as con:
             cur = con.cursor()
             cur.execute(
-                "INSERT INTO consent_registry(user_id_hash) VALUES (?)",
+                "INSERT INTO tracked_users(user_id_hash) VALUES (?)",
                 (user_id_hash,),
             )
         logger.debug(f"Registered consent for hash {user_id_hash[:6]}...")
@@ -91,9 +78,9 @@ def register_consent(user_id_hash: str, enc_user_id: str) -> None:
 
 
 def retract_consent(user_id_hash: str, enc_user_id: str) -> None:
-    """Remove a user’s consent and associated data records.
+    """Remove a use's consent and associated data records.
 
-    This deletes entries from both the `consent_registry` and `data` tables.
+    This deletes entries from both the `tracked_users` and `data` tables.
     Also logs the action to the audit log.
 
     Args:
@@ -107,7 +94,7 @@ def retract_consent(user_id_hash: str, enc_user_id: str) -> None:
         with get_connection() as con:
             cur = con.cursor()
             cur.execute(
-                "DELETE FROM consent_registry WHERE user_id_hash = ?", (user_id_hash,)
+                "DELETE FROM tracked_users WHERE user_id_hash = ?", (user_id_hash,)
             )
             cur.execute("DELETE FROM data WHERE user_id_hash = ?", (user_id_hash,))
         logger.debug(
@@ -135,7 +122,7 @@ def consent_is_registered(user_id_hash: str) -> bool:
         with get_connection() as con:
             cur = con.cursor()
             res = cur.execute(
-                "SELECT 1 FROM consent_registry WHERE user_id_hash = ?",
+                "SELECT 1 FROM tracked_users WHERE user_id_hash = ?",
                 (user_id_hash,),
             )
             found = res.fetchone() is not None

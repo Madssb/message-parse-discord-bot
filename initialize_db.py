@@ -1,4 +1,4 @@
-import os
+# initialize_db.py
 import sqlite3
 
 from config import DATABASE_PATH
@@ -19,8 +19,9 @@ def initialize_db():
 
         cursor.execute(
             """
-        CREATE TABLE IF NOT EXISTS consent_registry (
-            user_id_hash TEXT PRIMARY KEY
+        CREATE TABLE IF NOT EXISTS "tracked_users" (
+            user_id_hash TEXT PRIMARY KEY,
+            rank TEXT NOT NULL DEFAULT 'undefined'
         );
         """
         )

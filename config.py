@@ -16,6 +16,7 @@ DATABASE_PATH = os.getenv("DATABASE_PATH")
 
 
 LOGFILE_PATH = os.getenv("LOGFILE_PATH")
+COLLECT_PASSWORD = os.getenv("COLLECT_PASSWORD")
 
 
 def setup_logging(level: int = logging.DEBUG):

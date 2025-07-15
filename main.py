@@ -3,10 +3,10 @@ import logging
 
 import discord
 
+from collect_command import setup_collect_command
 from config import CHANNEL_ID, GUILD_ID, TOKEN, setup_logging
-from consent import setup_consent_commands
+from consent_command import setup_consent_commands
 from initialize_db import initialize_db
-from message_parser import setup_message_parse_command
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ initialize_db()
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
 
@@ -24,8 +25,9 @@ tree = discord.app_commands.CommandTree(client)
 async def on_ready():
     tree.clear_commands(guild=discord.Object(id=GUILD_ID))
     channel = client.get_channel(CHANNEL_ID)
-    setup_consent_commands(tree, GUILD_ID)
-    setup_message_parse_command(tree, channel, GUILD_ID)
+    guild = client.get_guild(GUILD_ID)
+    setup_consent_commands(tree)
+    setup_collect_command(tree, channel, guild)
     await tree.sync(guild=discord.Object(id=GUILD_ID))
     logger.info(f"Logged in as {client.user} (ID: {client.user.id})")
     logger.info("Slash commands synced.")
